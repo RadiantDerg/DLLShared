@@ -25,6 +25,7 @@ namespace Utils
 		}
 	};
 
+
 	class App
 	{
 	public:
@@ -43,6 +44,30 @@ namespace Utils
 				}
 			}
 			return addr;
+		}
+	};
+
+
+	//Temporary holding spot, dont use me!
+	class Misc
+	{
+	public:
+		/// <summary>Returns the name of <T>class</summary>
+		static inline const char* GetClassObjectName(const void* pObject)
+		{
+			try
+			{
+				class _dummy_virtual_class
+				{
+					virtual ~_dummy_virtual_class() = 0;
+				};
+				return typeid(*reinterpret_cast<const _dummy_virtual_class*>(pObject)).name();
+			}
+			catch (std::exception& e)
+			{
+				(void)e;
+				return "Invalid";//"Invalid: " << e.what();
+			}
 		}
 	};
 }
