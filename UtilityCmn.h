@@ -69,5 +69,41 @@ namespace Utils
 				return "Invalid";//"Invalid: " << e.what();
 			}
 		}
+
+
+		template<typename Scalar>
+		static inline Eigen::Matrix<Scalar, 4, 4> MakePerspectiveMatrix(const Scalar fieldOfView, const Scalar aspectRatio, const Scalar zNear, const Scalar zFar)
+		{
+			const Scalar yScale = (Scalar)1 / std::tan(fieldOfView / (Scalar)2);
+			const Scalar xScale = yScale / aspectRatio;
+
+			Eigen::Matrix<Scalar, 4, 4> matrix;
+
+			matrix <<
+				xScale, 0, 0, 0,
+				0, yScale, 0, 0,
+				0, 0, -(zFar + zNear) / (zFar - zNear), -2 * zNear * zFar / (zFar - zNear),
+				0, 0, -1, 0;
+
+			return matrix;
+		}
+
+
+		template<typename Scalar>
+		static inline Eigen::Matrix<Scalar, 4, 4> MakeOrthographicMatrix(const Scalar zNear, const Scalar zFar, Scalar orthoSize, Scalar aspectRatio)
+		{
+			Eigen::Matrix<Scalar, 4, 4> matrix;
+			const Scalar top = orthoSize;
+			const Scalar bottom = -orthoSize;
+			const Scalar right = orthoSize * aspectRatio;
+			const Scalar left = -right;
+			matrix <<
+				2 / (right - left), 0, 0, 0,
+				0, 2 / (top - bottom), 0, 0,
+				0, 0, 1 / (zNear - zFar), 0,
+				(left + right) / (left - right), (top + bottom) / (bottom - top), zNear / (zNear - zFar), 1;
+
+			return matrix;
+		}
 	};
 }
