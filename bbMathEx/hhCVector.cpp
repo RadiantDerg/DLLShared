@@ -110,6 +110,7 @@ namespace Hedgehog::Math
 
 	double CVector::Length(CVector* This)
 	{
+#ifdef _USE_INGAME_MATH
 		NANVEC(This);
 
 		BB_FUNCTION_PTR(double, __thiscall, func, 0x009BF710, CVector * _This);
@@ -118,12 +119,19 @@ namespace Hedgehog::Math
 		NANFLOAT(out);
 
 		return out;
+#else
+		return This->norm();
+#endif
 	}
 
 	float CVector::Length(const CVector& This)
 	{
+#ifdef _USE_INGAME_MATH
 		NANVEC(This);
 		return This.norm();
+#else
+		return This.norm();
+#endif
 	}
 
 	double CVector::Length() const
@@ -186,10 +194,13 @@ namespace Hedgehog::Math
 
 	CVector* CVector::SetZero(CVector* This)
 	{
+#ifdef _USE_INGAME_MATH
+		BB_FUNCTION_PTR(CVector, __thiscall, func, 0x009BFB10, CVector* _This);
+		return func(This);
+#else
 		*This = CVector::Zero();
 		return This;
-		//BB_FUNCTION_PTR(CVector, __thiscall, func, 0x009BFB10, CVector* _This);
-		//return func(This);
+#endif
 	}
 
 	void CVector::SetZero()
@@ -206,31 +217,44 @@ namespace Hedgehog::Math
 
 	void CVector::Normalize(CVector* This)
 	{
-		//BB_FUNCTION_PTR(void, __thiscall, func, 0x009BF970, CVector* _This);
-		//func(This);
+#ifdef _USE_INGAME_MATH
+		BB_FUNCTION_PTR(void, __thiscall, func, 0x009BF970, CVector* _This);
+		func(This);
+#else
 		*This = This->normalizedSafe();
+#endif
 	}
 
 	CVector CVector::Normalize(const CVector& This)
 	{
-		//BB_FUNCTION_PTR(void, __thiscall, func, 0x009BF970, CVector* _This);
-		//func(This);
+#ifdef _USE_INGAME_MATH
+		BB_FUNCTION_PTR(void, __thiscall, func, 0x009BF970, CVector* _This);
+		func(This);
+#else
 		return This.normalizedSafe();
+#endif
 	}
 
 	void CVector::Normalize()
 	{
-		//BB_FUNCTION_PTR(void, __thiscall, func, 0x009BF970, const CVector* _This);
-		//func(this);
+#ifdef _USE_INGAME_MATH
+		BB_FUNCTION_PTR(void, __thiscall, func, 0x009BF970, const CVector* _This);
+		func(this);
+#else
 		*this = this->normalizedSafe();
+#endif
 	}
 
 	CVector* CVector::Normalized(CVector* This, CVector* result)
 	{
-		//BB_FUNCTION_PTR(CVector*, __thiscall, func, 0x009BF7E0, CVector* _This, CVector* _result);
-		//return func(This, result);
-		*result = This->normalizedSafe();
+#ifdef _USE_INGAME_MATH
+		BB_FUNCTION_PTR(CVector*, __thiscall, func, 0x009BF7E0, CVector * _This, CVector * _result);
+		return func(This, result);
+
+#else
+		* result = This->normalizedSafe();
 		return result;
+#endif
 	}
 
 	CVector* CVector::Normalized(CVector* result) const
@@ -263,9 +287,10 @@ namespace Hedgehog::Math
 
 	CVector* CVector::Divide(CVector* result, CVector* value, float scalar)
 	{
-		//BB_FUNCTION_PTR(CVector*, __cdecl, func, 0x004030E0, CVector* _result, CVector* _value, float _scalar);
-		//return func(result, value, scalar);
-
+#ifdef _USE_INGAME_MATH
+		BB_FUNCTION_PTR(CVector*, __cdecl, func, 0x004030E0, CVector* _result, CVector* _value, float _scalar);
+		return func(result, value, scalar);
+#else
 		if (scalar < FLT_EPSILON)
 		{
 			*result = CVector::Zero();
@@ -282,6 +307,7 @@ namespace Hedgehog::Math
 		NANVEC(value);
 
 		return result;
+#endif
 	}
 
 	CVector CVector::Divide(const CVector& value, float scalar)
@@ -301,27 +327,36 @@ namespace Hedgehog::Math
 
 	CVector* CVector::Multiply(CVector* result, CVector* value, float scalar)
 	{
-		//BB_FUNCTION_PTR(CVector*, __cdecl, func, 0x009BFB90, CVector* _result, CVector* _value, float _scalar);
-		//return func(result, value, scalar);
-
+#ifdef _USE_INGAME_MATH
+		BB_FUNCTION_PTR(CVector*, __cdecl, func, 0x009BFB90, CVector* _result, CVector* _value, float _scalar);
+		return func(result, value, scalar);
+#else
 		*result = *value * scalar;
 		return result;
+#endif
+		
 	}
 
 	CVector* CVector::Multiply(CVector* result, float scalar, CVector* value)
 	{
-		//BB_FUNCTION_PTR(CVector*, __cdecl, func, 0x00404A70, CVector* _result, float _scalar, CVector* _value);
-		//return func(result, scalar, value);
+#ifdef _USE_INGAME_MATH
+		BB_FUNCTION_PTR(CVector*, __cdecl, func, 0x00404A70, CVector* _result, float _scalar, CVector* _value);
+		return func(result, scalar, value);
+#else
 		*result = *value * scalar;
 		return result;
+#endif
 	}
 
 	CVector* CVector::Multiply(CVector* vector, float scalar)
 	{
-		//BB_FUNCTION_PTR(CVector*, __thiscall, func, 0x009BFB40, CVector* _vector, float _scalar);
-		//return func(vector, scalar);
+#ifdef _USE_INGAME_MATH
+		BB_FUNCTION_PTR(CVector*, __thiscall, func, 0x009BFB40, CVector* _vector, float _scalar);
+		return func(vector, scalar);
+#else
 		*vector *= scalar;
 		return vector;
+#endif
 	}
 
 	double CVector::Dot(const CVector* This, const CVector* value)
@@ -342,16 +377,19 @@ namespace Hedgehog::Math
 
 	double CVector::Dot(const CVector& This, const CVector& value)
 	{
-		/*
+		
+#ifdef _USE_INGAME_MATH
+		
 		BB_FUNCTION_PTR(double, __thiscall, func, 0x009BF650, const CVector & _This, const CVector & _value);
 		double out = func(This, value);
 		NANVEC(This);
 		NANVEC(value);
 		NANFLOAT(out);
 		return out;
-		*/
-
+		
+#else
 		return This.dot(value);
+#endif
 	}
 
 	double CVector::Dot(CVector* value) const
@@ -377,6 +415,7 @@ namespace Hedgehog::Math
 		return This->squaredNorm();
 #endif
 	}
+
 	double CVector::LengthSqr(const CVector& This)
 	{
 		return This.squaredNorm();
@@ -476,9 +515,9 @@ namespace Hedgehog::Math
 	{
 		if (t < 0)
 			return a;
-		else
-			if (t > 1)
-				return b;
+		else if (t > 1)
+			return b;
+
 		return SlerpUnclamped(a, b, t);
 	}
 
@@ -541,11 +580,16 @@ namespace Hedgehog::Math
 
 	CVector CVector::normalizedSafe() const
 	{
-		CVector This = *this;
+		if (this->squaredNorm() < 0.0001f)
+			return CVector::Zero();
+
+		return this->normalized();
+
+		/*CVector This = *this;
 		CVector result = This.LengthSqr() > (DBL_EPSILON + DBL_EPSILON + DBL_EPSILON)
 					   ? This.normalized()
 					   : CVector(0, 0, 0);
-		return result;
+		return result;*/
 	}
 
 	CVector CVector::LerpUnclamped(const CVector& a, const CVector& b, const float t)

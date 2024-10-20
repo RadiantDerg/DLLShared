@@ -1,4 +1,8 @@
 #ifdef BB_EXCLUDE_MATH_DEFINITIONS
+#include "hhCQuaternion.h"
+
+#include <corecrt_math_defines.h>
+
 #include "hhCVector.h"
 #include "hhCVector4.h"
 #include "hhCMatrix.h"
@@ -13,32 +17,34 @@ namespace Hedgehog::Math
 		return *(CQuaternion*)&This;
 	}
 
-	CQuaternion CQuaternion::FromAxes(const CVector& a1, const CVector& a2, const CVector& a3)
+	CQuaternion CQuaternion::FromAxes(const CVector& in_rXAxis, const CVector& in_rYAxis, const CVector& in_rZAxis)
 	{
-		CQuaternion This = CQuaternion::Identity();
+#ifdef _USE_INGAME_MATH
+		BB_FUNCTION_PTR(CQuaternion*, __cdecl, func, 0x006F1950, CQuaternion* _This, const CVector& A1, const CVector& A2, const CVector& A3);
+		func(&This, in_rXAxis, in_rYAxis, in_rZAxis);
+		return This;
+#else
+		CQuaternion result = Identity();
 
-		const CVector AxisX = a1.normalizedSafe();
-		const CVector AxisY = a2.normalizedSafe();
+		const CVector AxisX = in_rXAxis.normalizedSafe();
+		const CVector AxisY = in_rYAxis.normalizedSafe();
 		CVector AxisZ = CVector::Cross(AxisX, AxisY);
 		const float axisZ_length = (float)AxisZ.Length();
 
 		AxisZ = AxisZ.normalizedSafe();
 		if (fabs(axisZ_length) < 0.000199999994947575)
-			AxisZ = a3.normalizedSafe();
+			AxisZ = in_rZAxis.normalizedSafe();
 
 		const float dot = std::clamp((float)CVector::Dot(AxisX, AxisY), -1.0f, 1.0f);
 		const double halfDot = dot * 0.5;
 		const float axisScale = sqrtf(0.5 - halfDot);
 
-		This.x() = AxisZ.x() * axisScale;
-		This.y() = AxisZ.y() * axisScale;
-		This.z() = AxisZ.z() * axisScale;
-		This.w() = sqrtf(0.5 + halfDot);
-		return This;
-
-		//BB_FUNCTION_PTR(CQuaternion*, __cdecl, func, 0x006F1950, CQuaternion* _This, const CVector& A1, const CVector& A2, const CVector& A3);
-		//func(&This, a1, a2, a3);
-		//return This;
+		result.x() = AxisZ.x() * axisScale;
+		result.y() = AxisZ.y() * axisScale;
+		result.z() = AxisZ.z() * axisScale;
+		result.w() = sqrtf(0.5 + halfDot);
+		return result;
+#endif
 	}
 
 	CQuaternion* CQuaternion::FromAxes(CQuaternion* out, CVector* axisX, CVector* axisY, CVector* axisZ)
@@ -95,10 +101,39 @@ namespace Hedgehog::Math
 
 	CMatrix44 CQuaternion::ToRotationMatrix() const
 	{
+#ifdef _USE_INGAME_MATH
 		CMatrix44 matrix = CMatrix44::Identity();
 		BB_FUNCTION_PTR(void*, __cdecl, func, 0x009BEF20, const CMatrix44 & mat, const CQuaternion * quat);
 		func(matrix, this);
 		return matrix;
+#else
+		const float SqrMagnitude = this->squaredNorm();
+		if (SqrMagnitude <= 0.0)
+			return CMatrix44::Identity();
+
+		const CQuaternion* rhs = this;
+
+		const float invNorm = 2.0f / SqrMagnitude;
+
+		CMatrix44 matrix = CMatrix44::Identity();
+
+		float* m = (float*)&matrix;
+
+		m[0 + 0] = 1.0 - ((rhs->y() * (rhs->y() * invNorm)) + (rhs->z() * (rhs->z() * invNorm)));
+		m[4 + 0] = (rhs->x() * (rhs->y() * invNorm)) - (rhs->w() * (rhs->z() * invNorm));
+		m[8 + 0] = (rhs->x() * (rhs->z() * invNorm)) + (rhs->w() * (rhs->y() * invNorm));
+
+		m[0 + 1] = (rhs->x() * (rhs->y() * invNorm)) + (rhs->w() * (rhs->z() * invNorm));
+		m[4 + 1] = 1.0 - ((rhs->x() * (rhs->x() * invNorm)) + (rhs->z() * (rhs->z() * invNorm)));
+		m[8 + 1] = (rhs->y() * (rhs->z() * invNorm)) - (rhs->w() * (rhs->x() * invNorm));
+
+		m[0 + 2] = (rhs->x() * (rhs->z() * invNorm)) - (rhs->w() * (rhs->y() * invNorm));
+		m[4 + 2] = (rhs->y() * (rhs->z() * invNorm)) + (rhs->w() * (rhs->x() * invNorm));
+		m[8 + 2] = 1.0 - ((rhs->x() * (rhs->x() * invNorm)) + (rhs->y() * (rhs->y() * invNorm)));
+
+		return matrix;
+#endif
+		
 	}
 
 	float CQuaternion::Angle(const CQuaternion& a, const CQuaternion& b)
@@ -184,9 +219,9 @@ namespace Hedgehog::Math
 	{
 		if (t < 0)
 			return Normalized(a);
-		else
-			if (t > 1)
-				return Normalized(b);
+		else if (t > 1)
+			return Normalized(b);
+
 		return LerpUnclamped(a, b, t, normalize);
 	}
 
@@ -279,8 +314,7 @@ namespace Hedgehog::Math
 		return rotation / Norm(rotation);
 	}
 
-	CQuaternion CQuaternion::RotateTowards(const CQuaternion& from, const CQuaternion& to,
-		float maxRadiansDelta)
+	CQuaternion CQuaternion::RotateTowards(const CQuaternion& from, const CQuaternion& to, float maxRadiansDelta)
 	{
 		float angle = CQuaternion::Angle(from, to);
 		if (angle == 0)
@@ -294,9 +328,9 @@ namespace Hedgehog::Math
 	{
 		if (t < 0)
 			return Normalized(a);
-		else
-			if (t > 1)
-				return Normalized(b);
+		else if (t > 1)
+			return Normalized(b);
+
 		return SlerpUnclamped(a, b, t, normalize);
 	}
 

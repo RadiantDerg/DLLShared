@@ -1,6 +1,5 @@
 #ifdef BB_EXCLUDE_MATH_DEFINITIONS
 #pragma once
-
 namespace Hedgehog::Math
 {
 	class CVector : public Eigen::AlignedVector3<float>
@@ -39,15 +38,16 @@ namespace Hedgehog::Math
 		static CVector Reject(const CVector& a, const CVector& b);
 
 		/**
-	 * Returns a vector reflected off the plane orthogonal to the normal.
-	 * The input vector is pointed inward, at the plane, and the return vector
-	 * is pointed outward from the plane, like a beam of light hitting and then
-	 * reflecting off a mirror.
-	 * @param vector: The vector traveling inward at the plane.
-	 * @param planeNormal: The normal of the plane off of which to reflect.
-	 * @return: A new vector pointing outward from the plane.
-	 */
+		* Returns a vector reflected off the plane orthogonal to the normal.
+		* The input vector is pointed inward, at the plane, and the return vector
+		* is pointed outward from the plane, like a beam of light hitting and then
+		* reflecting off a mirror.
+		* @param vector: The vector traveling inward at the plane.
+		* @param planeNormal: The normal of the plane off of which to reflect.
+		* @return: A new vector pointing outward from the plane.
+		*/
 		static CVector Reflect(const CVector& vector, const CVector& planeNormal);
+
 		CVector Reflect(const CVector& planeNormal) const;
 
 		static CVector ProjectOnPlane(const CVector& vector, const CVector& planeNormal);
@@ -116,14 +116,11 @@ namespace Hedgehog::Math
 
 		static float SignedAngle(const CVector& a, const CVector& b, const CVector& axis);
 
-		static CVector RotateTowards(const CVector& from, const CVector& to,
-			float maxRadiansDelta);
+		static CVector RotateTowards(const CVector& from, const CVector& to, float maxRadiansDelta);
 
-		static CVector LerpTowards(const CVector& from, const CVector& to,
-			float maxRadiansDelta);
+		static CVector LerpTowards(const CVector& from, const CVector& to, float maxRadiansDelta);
 
-		static CVector SlerpTowards(const CVector& from, const CVector& to,
-			float maxRadiansDelta);
+		static CVector SlerpTowards(const CVector& from, const CVector& to, float maxRadiansDelta);
 
 		static CVector Scale(const CVector& a, const CVector& b);
 

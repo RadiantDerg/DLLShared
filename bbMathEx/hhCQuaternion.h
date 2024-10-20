@@ -119,8 +119,7 @@ namespace Hedgehog::Math
 		 * @param normalize: Weather or not to normalize the quaternion (default is true).
 		 * @return: A new quaternion.
 		 */
-		static CQuaternion LerpUnclamped(const CQuaternion& a, const CQuaternion& b,
-			float t, bool normalize = false);
+		static CQuaternion LerpUnclamped(const CQuaternion& a, const CQuaternion& b, float t, bool normalize = false);
 
 		/**
 		 * Creates a rotation with the specified forward direction. This is the
@@ -164,8 +163,7 @@ namespace Hedgehog::Math
 		 # @param maxRadiansDelta: The maximum number of radians to rotate.
 		 * @return: A new CQuaternion.
 		 */
-		static CQuaternion RotateTowards(const CQuaternion& from, const CQuaternion& to,
-			float maxRadiansDelta);
+		static CQuaternion RotateTowards(const CQuaternion& from, const CQuaternion& to, float maxRadiansDelta);
 
 		/**
 		 * Returns a new quaternion interpolated between a and b, usinfg spherical
@@ -188,8 +186,7 @@ namespace Hedgehog::Math
 		 * @param normalize: Weather or not to normalize the quaternion (default is true).
 		 * @return: A new quaternion.
 		 */
-		static CQuaternion SlerpUnclamped(const CQuaternion& a, const CQuaternion& b,
-			float t, bool normalize = false);
+		static CQuaternion SlerpUnclamped(const CQuaternion& a, const CQuaternion& b, float t, bool normalize = false);
 
 		/**
 		 * Slerps the current quaternion towards the target, similar to RotateTowards.
@@ -202,8 +199,7 @@ namespace Hedgehog::Math
 		 * @param angle: The output angle.
 		 * @param axis: The output axis.
 		 */
-		static void ToAngleAxis(const CQuaternion& rotation, float& angle,
-			CVector& axis);
+		static void ToAngleAxis(const CQuaternion& rotation, float& angle, CVector& axis);
 
 		/**
 		 * Returns the Euler angle representation of a rotation. The resulting
@@ -215,9 +211,8 @@ namespace Hedgehog::Math
 
 		CMatrix44 ToRotationMatrix() const;
 
-		//// extra crap
-		static CQuaternion FromAxes(const CVector& a1, const CVector& a2, const CVector& a3);
-
+		// These are used in Generations as far as I know.
+		static CQuaternion FromAxes(const CVector& in_rXAxis, const CVector& in_rYAxis, const CVector& in_rZAxis);
 		static CQuaternion* FromAxes(CQuaternion* out, CVector* axisX, CVector* axisY, CVector* axisZ);
 	};
 }
