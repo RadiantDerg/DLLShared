@@ -22,6 +22,21 @@ struct Vector3
 	float x;
 	float y;
 	float z;
+
+	Vector3 operator+=(const Vector3& in)
+	{
+		this->x += in.x;
+		this->y += in.y;
+		this->y += in.y;
+		return *this;
+	}
+	Vector3 operator*(const Vector3& in)
+	{
+		this->x * in.x;
+		this->y * in.y;
+		this->z * in.z;
+		return *this;
+	}
 };
 
 struct Vector4
